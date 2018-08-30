@@ -12,7 +12,7 @@ module UniqueNumbers
       self.with_lock do
         self.value = start_value - 1 if needs_reset?
         self.value += 1
-        self.last_generated_at = Time.now
+        self.last_generated_at = Time.zone.now
         self.save!
         model.update_columns(attribute => formatted_number(value, last_generated_at))
       end
@@ -22,15 +22,15 @@ module UniqueNumbers
     def needs_reset?
       self.value.blank? or self.last_generated_at.blank? or case reset
       when :hourly
-        self.last_generated_at < Time.now.beginning_of_hour
+        self.last_generated_at < Time.zone.now.beginning_of_hour
       when :daily
-        self.last_generated_at < Time.now.beginning_of_day
+        self.last_generated_at < Time.zone.now.beginning_of_day
       when :weekly
-        self.last_generated_at < Time.now.beginning_of_week
+        self.last_generated_at < Time.zone.now.beginning_of_week
       when :monthly
-        self.last_generated_at < Time.now.beginning_of_month
+        self.last_generated_at < Time.zone.now.beginning_of_month
       when :yearly
-        self.last_generated_at < Time.now.beginning_of_year
+        self.last_generated_at < Time.zone.now.beginning_of_year
       else
         false
       end
